@@ -1,0 +1,5 @@
+namespace = "multitenant"
+region = "us-east-1"
+instance_type = "t2.nano"
+ami = "ami-09e67e426f25ce0d7"
+keypath = "~/.ssh/id_rsa.pub"

@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+source .env
+
+ssh -i $KEY_PATH -L 5432:localhost:5432 ubuntu@$DNS
+

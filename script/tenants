@@ -1,0 +1,30 @@
+#!/bin/bash
+
+KEY_PATH="~/.ssh/id_rsa.pem"
+DNS=$(terraform output -json | jq .ec2_dns.value -r)
+
+function query {
+    ssh  ubuntu@$DNS -i $KEY_PATH "sudo -u postgres psql -c \"$1\""
+}
+
+function bold {
+    echo "\033[1m$1\033[0m"
+}
+
+ACTION=$1
+
+if [[ $ACTION = "new" ]]; then
+    TENANT_USER=$2
+    TENANT_PASSWORD=$3
+    query "CREATE USER $TENANT_USER WITH PASSWORD '$PASSWORD';"
+    query "CREATE DATABASE tenant_$TENANT_USER WITH OWNER $TENANT_USER;"
+
+    echo "Created user $TENANT_USER owning database tenant_$TENANT_USER"
+elif [[ $ACTION = "list" ]]; then
+    query "SELECT usename FROM pg_user;"
+else
+    bold "\nAvailable actions:\n"
+    echo "$(bold "new <username> <password>")\n\tCreates a new tenant and owned database tenant_<username>"
+    echo "$(bold "list")\n\tLists all existing tenants"
+
+fi
